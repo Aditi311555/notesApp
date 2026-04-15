@@ -1,0 +1,61 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# TaskFlow API — Docker Compose Staging Environment
+# Usage:
+#   docker-compose up -d               → start staging
+#   docker-compose down                → stop staging
+#   docker-compose logs -f api         → tail logs
+#   docker-compose ps                  → check running containers
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── Main API Service ────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: taskflow-api
+    image: taskflow-api:latest
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: staging
+      PORT: 3000
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    networks:
+      - taskflow-net
+    labels:
+      - "traefik.enable=false"
+      - "com.taskflow.service=api"
+      - "com.taskflow.environment=staging"
+
+  # ── Nginx Reverse Proxy ─────────────────────────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: taskflow-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - taskflow-net
+    labels:
+      - "com.taskflow.service=proxy"
+
+networks:
+  taskflow-net:
+    driver: bridge
+    name: taskflow-network

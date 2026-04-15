@@ -1,0 +1,46 @@
+{
+  "name": "taskflow-api",
+  "version": "1.0.0",
+  "description": "A lightweight Task Manager REST API demonstrating full DevOps lifecycle",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "jest --coverage --forceExit",
+    "test:ci": "jest --coverage --forceExit --ci --reporters=default --reporters=jest-junit",
+    "lint": "eslint src/ tests/",
+    "build": "npm install && npm run lint && npm test",
+    "clean": "rm -rf node_modules coverage"
+  },
+  "keywords": ["devops", "api", "rest", "task-manager", "ci-cd"],
+  "author": "Student",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "uuid": "^9.0.0",
+    "cors": "^2.8.5",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4",
+    "eslint": "^8.57.0",
+    "jest-junit": "^16.0.0",
+    "nodemon": "^3.1.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/app.js"
+    ],
+    "coverageReporters": ["text", "lcov", "html"],
+    "coverageThreshold": {
+      "global": {
+        "branches": 70,
+        "functions": 80,
+        "lines": 80
+      }
+    }
+  }
+}
