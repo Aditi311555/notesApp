@@ -14,7 +14,7 @@ app.use(morgan('combined'));
 // ─── Routes ───────────────────────────────────────────────────────────────────
 app.use('/api/tasks', taskRoutes);
 
-// Health check endpoint (used by Docker & CI)
+// Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
@@ -33,23 +33,20 @@ app.get('/', (req, res) => {
   });
 });
 
-// ─── 404 Handler ──────────────────────────────────────────────────────────────
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-// ─── Global Error Handler ─────────────────────────────────────────────────────
+// Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ error: 'Internal server error', message: err.message });
 });
 
-// ─── Start Server ─────────────────────────────────────────────────────────────
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`TaskFlow API listening on port ${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  });
-}
+// ✅ Start server (ONLY ONCE)
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 module.exports = app;
